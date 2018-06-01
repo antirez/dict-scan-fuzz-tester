@@ -195,7 +195,7 @@ int main(int argc, char **argv) {
             opt_seed = atoi(argv[++j]);
         } else if (!strcasecmp(argv[j],"--size") && moreargs >= 2) {
             opt_table0_size = atoi(argv[++j]);
-            opt_table0_size = atoi(argv[++j]);
+            opt_table1_size = atoi(argv[++j]);
         } else if (!strcasecmp(argv[j],"--help")) {
             printf("Usage:\n");
             printf(" --help              Print this help.\n");
