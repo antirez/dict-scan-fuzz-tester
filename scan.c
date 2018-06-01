@@ -81,22 +81,31 @@ void check(dictht *t, char *name) {
     }
 }
 
+void expand(dictht *old, dictht *new) {
+}
+
 int main(void) {
     dictht t0, t1;
 
-    t0.size = 8;
-    t0.sizemask = t0.size-1;
-    memset(t0.visited,0,sizeof(t0.visited));
-    t1.size = 32;
+    t1.size = 8;
     t1.sizemask = t1.size-1;
     memset(t1.visited,0,sizeof(t1.visited));
 
+    t0.size = 32;
+    t0.sizemask = t0.size-1;
+    memset(t0.visited,0,sizeof(t0.visited));
+
     unsigned long cursor = 0;
     int iteration = 0;
+    int first_rehashing_step = 1;
     do {
-        if (iteration == 0) {
+        if (iteration < 1) {
             cursor = dictScan(&t1, NULL, cursor, NULL);
         } else {
+            if (first_rehashing_step) {
+                expand(&t0,&t1);
+                first_rehashing_step = 0;
+            }
             cursor = dictScan(&t0, &t1, cursor, NULL);
         }
         printf("cursor %lu\n", cursor);
