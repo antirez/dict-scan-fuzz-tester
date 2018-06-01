@@ -117,46 +117,54 @@ void expand(dictht *old, dictht *new) {
     }
 }
 
-int main(void) {
-    srand(time(NULL));
-    dictht t0, t1;
-
-    t0.size = 8;
-    t0.sizemask = t0.size-1;
-    memset(t0.visited,0,sizeof(t0.visited));
-
-    t1.size = 32;
-    t1.sizemask = t1.size-1;
-    memset(t1.visited,0,sizeof(t1.visited));
-
+int test_scan(dictht *t0, dictht *t1) {
     unsigned long cursor = 0;
     int iteration = 0;
     int before_rehashing = 1;
     int first_rehashing_step = 1;
     do {
         if (before_rehashing) {
-            cursor = dictScan(&t0, NULL, cursor, NULL);
-            if (!(rand() % t0.size)) {
+            cursor = dictScan(t0, NULL, cursor, NULL);
+            if (!(rand() % t0->size)) {
                 before_rehashing = 0;
                 printf("Rehashing to new table: %lu -> %lu\n",
-                    t0.size, t1.size);
+                    t0->size, t1->size);
             }
         } else {
             if (first_rehashing_step) {
-                expand(&t0,&t1);
+                expand(t0,t1);
                 first_rehashing_step = 0;
             }
-            cursor = dictScan(&t0, &t1, cursor, NULL);
+            cursor = dictScan(t0, t1, cursor, NULL);
         }
         printf("cursor %lu\n", cursor);
         iteration++;
     } while (cursor != 0);
 
     /* Check that the two tables were visited. */
-    if (check(&t0,"table 0")) exit(1);
+    if (check(t0,"table 0")) return 1;
     /* Check the second talbe only if the rehashing happened. */
     if (!first_rehashing_step) {
-        if (check(&t1,"table 1")) exit(1);
+        if (check(t1,"table 1")) return 1;
+    }
+    return 0;
+}
+
+int main(void) {
+    srand(time(NULL));
+    dictht t0, t1;
+
+
+    while(1) {
+        t0.size = 32;
+        t0.sizemask = t0.size-1;
+        memset(t0.visited,0,sizeof(t0.visited));
+
+        t1.size = 8;
+        t1.sizemask = t1.size-1;
+        memset(t1.visited,0,sizeof(t1.visited));
+
+        if (test_scan(&t0,&t1)) exit(1);
     }
 
     return 0;
